@@ -6,17 +6,17 @@ const imageController = require('../controllers/images');
 const imageTypes = [ 'image/png', 'image/jpg', 'image/jpeg' ];
 
 const upload = multer({
-	dest: 'images',
-	limits: {
-		fileSize: 1000000
-	},
-	fileFilter(req, file, cb) {
-		if (!imageTypes.includes(file.mimetype)) {
-			return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
-		}
+  dest: 'images',
+  limits: {
+    fileSize: 1000000
+  },
+  fileFilter(req, file, cb) {
+    if (!imageTypes.includes(file.mimetype)) {
+      return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+    }
 
-		cb(undefined, true);
-	}
+    cb(undefined, true);
+  }
 });
 
 router.get('/', (req, res, next) => {
