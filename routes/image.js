@@ -5,8 +5,10 @@ const imageController = require('../controllers/images');
 
 const imageTypes = [ 'image/png', 'image/jpg', 'image/jpeg' ];
 
+const storage = multer.memoryStorage();
+
 const upload = multer({
-  dest: 'images',
+  storage: storage,
   limits: {
     fileSize: 1000000
   },

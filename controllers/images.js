@@ -3,37 +3,26 @@ const Image = require('../models/imageModel');
 const successHandle = require('../utils/successHandler');
 const errorHandle = require('../utils/errorHandler');
 
-// const imageTypes = [ 'image/png', 'image/jpg', 'image/jpeg' ];
-
-// const upload = multer({
-//   dest: 'images',
-//   limits: {
-//     fileSize: 1000000
-//   },
-//   fileFilter(req, file, cb) {
-//     if (!imageTypes.includes(file.mimetype)) {
-//       return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
-//     }
-
-//     cb(undefined, true);
-//   }
-// });
-
 const images = {
   getImages: async (res) => {
-
+		try {
+			const allImages = await Image.find();
+			successHandle(res, allImages);
+		}
+		catch (err) {
+			errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
+		}
   },
   getSingleImages: async (req, res) => {
 
   },
   createSingleImage: async (req, res) => {
     try {
-      console.log('req.body', req.body)
-      console.log('req.file', req.file)
+			const encode_image = req.file.buffer.toString('base64');
       const newImage = new Image({
         name: req.body.name,
         image: {
-          data: req.file.filename,
+          data: encode_image,
           contentType: req.file.mimetype
         },
       });
@@ -41,8 +30,8 @@ const images = {
       await newImage.save();
       res.send('successfully upload image');
     }
-    catch (error) {
-      res.status(400).send({ error: error.message });
+    catch (err) {
+			errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }
   },
   deleteAllImages: async (res) => {
