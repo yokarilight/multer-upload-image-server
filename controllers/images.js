@@ -1,3 +1,4 @@
+const { ImgurClient } = require('imgur');
 const httpStatusCodes = require('../constants/statusCode');
 const Image = require('../models/imageModel');
 const successHandle = require('../utils/successHandler');
@@ -18,13 +19,22 @@ const images = {
   },
   createSingleImage: async (req, res) => {
     try {
-			const encode_image = req.file.buffer.toString('base64');
+      const client = new ImgurClient({
+        clientId: process.env.IMGUR_CLIENTID,
+        clientSecret: process.env.IMGUR_CLIENT_SECRET,
+        refreshToken: process.env.IMGUR_REFRESH_TOKEN,
+      });
+      
+      const response = await client.upload({
+        image: req.file.buffer.toString('base64'),
+        type: 'base64',
+        title: req.body.name,
+        album: process.env.IMGUR_ALBUM_ID
+      });
+
       const newImage = new Image({
-        name: req.body.name,
-        image: {
-          data: encode_image,
-          contentType: req.file.mimetype
-        },
+        imageUrl: response.data.link,
+        imageName: response.data.title,
       });
 
       await newImage.save();

@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const imageSchema = new Schema({
-  name: {
+  imageUrl: {
+    type: String,
+    required: [ true, 'image url is empty' ],
+  },
+  imageName: {
     type: String,
     required: [ true, 'image name is empty' ],
-  },
-  image: {
-    data: Buffer,
-    contentType: String,
   },
 });
 
