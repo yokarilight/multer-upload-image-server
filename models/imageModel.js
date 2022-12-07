@@ -10,6 +10,10 @@ const imageSchema = new Schema({
     type: String,
     required: [ true, 'image name is empty' ],
   },
+  imageDeleteHash: {
+    type: String,
+    required: [ true, 'image delete hash is empty' ],
+  }
 });
 
 const Image = mongoose.model('Image', imageSchema);

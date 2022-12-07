@@ -14,9 +14,6 @@ const images = {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }
   },
-  getSingleImages: async (req, res) => {
-
-  },
   createSingleImage: async (req, res) => {
     try {
       const client = new ImgurClient({
@@ -35,6 +32,7 @@ const images = {
       const newImage = new Image({
         imageUrl: response.data.link,
         imageName: response.data.title,
+        imageDeleteHash: response.data.deletehash,
       });
 
       await newImage.save();
@@ -44,11 +42,23 @@ const images = {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }
   },
-  deleteAllImages: async (res) => {
-
-  },
   deleteSingleImage: async (req, res) => {
+    try {
+      const client = new ImgurClient({
+        clientId: process.env.IMGUR_CLIENTID,
+        clientSecret: process.env.IMGUR_CLIENT_SECRET,
+        refreshToken: process.env.IMGUR_REFRESH_TOKEN,
+      });
 
+      const { id } = req.params;
+      const hash = req.body.hash;
+      await Image.findByIdAndDelete(id);
+      await client.deleteImage(hash);
+      const allImages = await Image.find();
+      successHandle(res, allImages);
+    } catch (err) {
+      errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
+    }
   },
   
   // getPosts: async (res) => {
