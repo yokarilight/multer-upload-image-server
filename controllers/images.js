@@ -6,13 +6,13 @@ const errorHandle = require('../utils/errorHandler');
 
 const images = {
   getImages: async (res) => {
-		try {
-			const allImages = await Image.find();
-			successHandle(res, allImages);
-		}
-		catch (err) {
-			errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
-		}
+    try {
+      const allImages = await Image.find();
+      successHandle(res, allImages);
+    }
+    catch (err) {
+      errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
+    }
   },
   getSingleImages: async (req, res) => {
 
@@ -41,7 +41,7 @@ const images = {
       res.send('successfully upload image');
     }
     catch (err) {
-			errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
+      errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }
   },
   deleteAllImages: async (res) => {
