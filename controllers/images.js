@@ -1,5 +1,6 @@
 const { ImgurClient } = require('imgur');
 const httpStatusCodes = require('../constants/statusCode');
+const errMsgs = require('../constants/errMsgs');
 const Image = require('../models/imageModel');
 const successHandle = require('../utils/successHandler');
 const errorHandle = require('../utils/errorHandler');
@@ -15,6 +16,14 @@ const images = {
     }
   },
   createSingleImage: async (req, res) => {
+    const { 'name': imageName } = req.body;
+
+    if (!req.file || !imageName) {
+      errorHandle(res, { message: errMsgs.POST_CREATE_SINGLE_IMAGE_NAME_FILE_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+
+      return;
+    }
+
     try {
       const client = new ImgurClient({
         clientId: process.env.IMGUR_CLIENTID,
@@ -25,7 +34,7 @@ const images = {
       const response = await client.upload({
         image: req.file.buffer.toString('base64'),
         type: 'base64',
-        title: req.body.name,
+        title: imageName,
         album: process.env.IMGUR_ALBUM_ID
       });
 
@@ -43,6 +52,15 @@ const images = {
     }
   },
   deleteSingleImage: async (req, res) => {
+    const { id } = req.params;
+    const hash = req.body.hash;
+
+    if (!id || !hash) {
+      errorHandle(res, { message: errMsgs.DELETE_IMAGE_ID_HASH_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+
+      return;
+    }
+
     try {
       const client = new ImgurClient({
         clientId: process.env.IMGUR_CLIENTID,
@@ -50,9 +68,11 @@ const images = {
         refreshToken: process.env.IMGUR_REFRESH_TOKEN,
       });
 
-      const { id } = req.params;
-      const hash = req.body.hash;
       await Image.findByIdAndDelete(id);
+
+      // something weird: if I remove some characters from the end of hash, it still can delete data from mongoDB
+      // however, target image in imgur dashboard is still existed
+      // e.g. hash: ABC123456 -> hash: ABC12345, will happen as above
       await client.deleteImage(hash);
       const allImages = await Image.find();
       successHandle(res, allImages);

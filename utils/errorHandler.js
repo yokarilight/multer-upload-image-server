@@ -3,6 +3,7 @@ const errorHandle = (res, err, statusCode) => {
 
   res.status(statusCode).send({
     status: true,
+    code: statusCode,
     message
   });
 }
