@@ -1,20 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const { ImageTypes } = require('../constants/mimeTypes');
 const imageController = require('../controllers/images');
-
-const imageTypes = [ 'image/png', 'image/jpg', 'image/jpeg' ];
 
 const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 1000000
+    fileSize: 1024 * 1024 * 2
   },
   fileFilter(req, file, cb) {
-    if (!imageTypes.includes(file.mimetype)) {
+    if (!ImageTypes.includes(file.mimetype)) {
       return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+      // cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE'), false);
     }
 
     cb(undefined, true);

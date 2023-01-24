@@ -1,6 +1,6 @@
 const { ImgurClient } = require('imgur');
 const httpStatusCodes = require('../constants/statusCode');
-const errMsgs = require('../constants/errMsgs');
+const { successMsgs, errMsgs } = require('../constants/msgs');
 const Image = require('../models/imageModel');
 const successHandle = require('../utils/successHandler');
 const errorHandle = require('../utils/errorHandler');
@@ -45,7 +45,7 @@ const images = {
       });
 
       await newImage.save();
-      res.send('successfully upload image');
+      successHandle(res, successMsgs.POST_CREATE_SINGLE_IMAGE_NAME_SUCCESS);
     }
     catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
@@ -74,8 +74,9 @@ const images = {
       // however, target image in imgur dashboard is still existed
       // e.g. hash: ABC123456 -> hash: ABC12345, will happen as above
       await client.deleteImage(hash);
-      const allImages = await Image.find();
-      successHandle(res, allImages);
+      // const allImages = await Image.find();
+      
+      successHandle(res, successMsgs.DELETE_IMAGES_SUCCESS);
     } catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }
