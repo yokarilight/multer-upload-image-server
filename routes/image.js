@@ -22,22 +22,73 @@ const upload = multer({
 });
 
 router.get('/', (req, res, next) => {
+  /**
+   * #swagger.tags = ['Images - 圖片相關API']
+   * #swagger.description = 'Get All Images API'
+   * #swagger.responses[200] = {
+      description: 'Response',
+      schema: {
+        "status": true,
+        "data": [{
+          "_id": "63d14c3955bd40e5a3bda371",
+          "imageUrl": "https://i.imgur.com/plkurey.jpg",
+          "imageName": "philly",
+          "imageDeleteHash": "WT8EUyxW10rKSv2"
+        }]
+      }
+    }
+    */
   imageController.getImages(res);
 });
 
-router.get('/:id', (req, res, next) => {
-  imageController.getSingleImages(req, res);
-});
+// router.get('/:id', (req, res, next) => {
+//   imageController.getSingleImages(req, res);
+// });
 
 router.post('/', upload.single('image'), (req, res, next) => {
+  /**
+    * #swagger.tags = ['Images - 圖片相關API']
+    * #swagger.description = 'Upload Image API'
+    * #swagger.parameters['image'] = {
+        in: 'formData',
+        type: 'file',
+        required: 'true',
+        description: 'Single image that you upload',
+      }
+    * #swagger.responses[200] = {
+        description: 'Response',
+        schema: {
+          "status": true,
+          "data": "Upload image successfully"
+        }
+      }
+    */
   imageController.createSingleImage(req, res);
 });
 
-router.delete('/', (req, res, next) => {
-  imageController.deleteAllImages(res);
-});
+// router.delete('/', (req, res, next) => {
+//   imageController.deleteAllImages(res);
+// });
 
 router.delete('/:id', (req, res, next) => {
+  /**
+    * #swagger.tags = ['Images - 圖片相關API']
+    * #swagger.description = 'Delete Image API'
+    * #swagger.parameters['obj'] = {
+        in: 'body',
+        description: 'Should attach image hash',
+        schema: {
+          $hash: 'Image hash',
+        }
+      }
+    * #swagger.responses[200] = {
+        description: 'Response',
+        schema: {
+          "status": true,
+          "data": "Delete image successfully"
+        }
+      }
+    */
   imageController.deleteSingleImage(req, res);
 });
 

@@ -16,10 +16,8 @@ const images = {
     }
   },
   createSingleImage: async (req, res) => {
-    const { 'name': imageName } = req.body;
-
-    if (!req.file || !imageName) {
-      errorHandle(res, { message: errMsgs.POST_CREATE_SINGLE_IMAGE_NAME_FILE_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+    if (!req.file) {
+      errorHandle(res, { message: errMsgs.POST_CREATE_SINGLE_IMAGE_FILE_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
@@ -34,7 +32,7 @@ const images = {
       const response = await client.upload({
         image: req.file.buffer.toString('base64'),
         type: 'base64',
-        title: imageName,
+        title: req.file.originalname,
         album: process.env.IMGUR_ALBUM_ID
       });
 

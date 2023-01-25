@@ -1,0 +1,332 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Signature Service API",
+    "description": "This API doc is for Signature Service, including signature image and file CRUD.",
+    "version": "1.0.0"
+  },
+  "host": "localhost:8000",
+  "basePath": "/",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {
+    "/image/": {
+      "get": {
+        "tags": [
+          "Images - 圖片相關API"
+        ],
+        "description": "Get All Images API",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "string",
+                        "example": "63d14c3955bd40e5a3bda371"
+                      },
+                      "imageUrl": {
+                        "type": "string",
+                        "example": "https://i.imgur.com/plkurey.jpg"
+                      },
+                      "imageName": {
+                        "type": "string",
+                        "example": "philly"
+                      },
+                      "imageDeleteHash": {
+                        "type": "string",
+                        "example": "WT8EUyxW10rKSv2"
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Images - 圖片相關API"
+        ],
+        "description": "Upload Image API",
+        "parameters": [
+          {
+            "name": "image",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Single image that you upload"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "data": {
+                  "type": "string",
+                  "example": "Upload image successfully"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/image/{id}": {
+      "delete": {
+        "tags": [
+          "Images - 圖片相關API"
+        ],
+        "description": "Delete Image API",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Should attach image hash",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "hash": {
+                  "type": "string",
+                  "example": "Image hash"
+                }
+              },
+              "required": [
+                "hash"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "data": {
+                  "type": "string",
+                  "example": "Delete image successfully"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/file/": {
+      "get": {
+        "tags": [
+          "Files - 文件相關API"
+        ],
+        "description": "Get All Files API",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "string",
+                        "example": "63d13d5a2782fdfa5e2f239d"
+                      },
+                      "fileLocation": {
+                        "type": "string",
+                        "example": "https://nodejs-signature-document-s3.s3.amazonaws.com/%E6%9C%80%E9%AB%98%E5%AD%B8%E7%BF%92%E6%B3%95%E5%BF%83%E5%BE%97.docx"
+                      },
+                      "fileName": {
+                        "type": "string",
+                        "example": "最高學習法心得.docx"
+                      },
+                      "fileKey": {
+                        "type": "string",
+                        "example": "最高學習法心得.docx"
+                      },
+                      "fileEtag": {
+                        "type": "string",
+                        "example": "\"15c0de85bce4f03fea5da6a77e0db16b\""
+                      },
+                      "fileBucket": {
+                        "type": "string",
+                        "example": "nodejs-signature-document-s3"
+                      }
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Files - 文件相關API"
+        ],
+        "description": "Upload File API",
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Single file that you upload"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "data": {
+                  "type": "string",
+                  "example": "Upload file successfully"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/file/download": {
+      "get": {
+        "tags": [
+          "Files - 文件相關API"
+        ],
+        "description": "Download File API",
+        "parameters": [
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Should attach filename",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "example": "Your filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ],
+        "responses": {}
+      }
+    },
+    "/file/{id}": {
+      "delete": {
+        "tags": [
+          "Files - 文件相關API"
+        ],
+        "description": "Delete File API",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "Should attach filename",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "example": "Your filename"
+                }
+              },
+              "required": [
+                "filename"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "data": {
+                  "type": "string",
+                  "example": "Delete file successfully"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

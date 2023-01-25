@@ -14,11 +14,11 @@ const fileSchema = new Schema({
     type: String,
     required: [ true, 'file key is empty' ],
   },
-	fileEtag: {
+  fileEtag: {
     type: String,
     required: [ true, 'file etag is empty' ],
   },
-	fileBucket: {
+  fileBucket: {
     type: String,
     required: [ true, 'file bucket is empty' ],
   }

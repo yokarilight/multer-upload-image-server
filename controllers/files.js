@@ -17,7 +17,7 @@ const s3GetFiles = async () => {
 }
 
 const s3Uploadv2 = async (files) => {
-	const params = files.map((file) => {
+  const params = files.map((file) => {
     return {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: file.originalname,
@@ -64,8 +64,9 @@ const files = {
     }
   },
   downloadFiles: async (req, res) => {
+    const { filename } = req.body;
+    
     try {
-      const { filename } = req.params;
       const x = await s3.getObject({
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: filename,
@@ -93,7 +94,7 @@ const files = {
 
       await File.findByIdAndDelete(id);
 
-      successHandle(res, successMsgs.DELETE_FILES_FILENAME_REQUIRED);
+      successHandle(res, successMsgs.DELETE_FILES_SUCCESS);
     }
     catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
