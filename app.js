@@ -4,6 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const helmet = require('helmet');
 const swaggerUI = require('swagger-ui-express');
 const swaggerFile = require('./swagger-output.json');
 
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(helmet());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

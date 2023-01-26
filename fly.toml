@@ -1,6 +1,6 @@
-# fly.toml file generated for small-snow-571 on 2023-01-26T12:39:44+08:00
+# fly.toml file generated for withered-hill-8882 on 2023-01-26T23:34:51+08:00
 
-app = "small-snow-571"
+app = "withered-hill-8882"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
