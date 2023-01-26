@@ -5,7 +5,7 @@
     "description": "This API doc is for Signature Service, including signature image and file CRUD.",
     "version": "1.0.0"
   },
-  "host": "localhost:8000",
+  "host": "localhost:8080",
   "basePath": "/",
   "schemes": [
     "http",
