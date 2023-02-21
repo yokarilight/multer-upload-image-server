@@ -51,10 +51,16 @@ const images = {
   },
   deleteSingleImage: async (req, res) => {
     const { id } = req.params;
-    const hash = req.body.hash;
+    const { hash, imageUrl } = req.body;
 
-    if (!id || !hash) {
-      errorHandle(res, { message: errMsgs.DELETE_IMAGE_ID_HASH_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+    if (!id) {
+      errorHandle(res, { message: errMsgs.DELETE_IMAGE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+
+      return;
+    }
+
+    if (!hash || !imageUrl) {
+      errorHandle(res, { message: errMsgs.DELETE_IMAGE_HASH_IMAGEURL_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
@@ -66,15 +72,20 @@ const images = {
         refreshToken: process.env.IMGUR_REFRESH_TOKEN,
       });
 
-      await Image.findByIdAndDelete(id);
+      const { status } = await fetch(imageUrl);
 
       // something weird: if I remove some characters from the end of hash, it still can delete data from mongoDB
       // however, target image in imgur dashboard is still existed
       // e.g. hash: ABC123456 -> hash: ABC12345, will happen as above
-      await client.deleteImage(hash);
-      // const allImages = await Image.find();
-      
-      successHandle(res, successMsgs.DELETE_IMAGES_SUCCESS);
+      if (status === 200) {
+        await client.deleteImage(hash);
+        await Image.findByIdAndDelete(id);
+        successHandle(res, successMsgs.DELETE_IMAGES_SUCCESS);
+      }
+      else {
+        errorHandle(res, { message: errMsgs.CANNOT_FIND_THIS_IMAGE }, httpStatusCodes.BAD_REQUEST);
+      }
+
     } catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }

@@ -79,6 +79,7 @@ router.delete('/:id', (req, res, next) => {
         description: 'Should attach image hash',
         schema: {
           $hash: 'Image hash',
+          $imageUrl: 'Imgur image Url'
         }
       }
     * #swagger.responses[200] = {

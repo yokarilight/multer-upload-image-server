@@ -5,7 +5,7 @@ const doc = {
     title: 'Signature Service API',
     description: 'This API doc is for Signature Service, including signature image and file CRUD.'
   },
-  host: 'localhost:8080',
+  host: 'auto-signature-app.fly.dev',
   schemes: ['http', 'https'],
 };
 
