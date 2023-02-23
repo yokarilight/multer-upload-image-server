@@ -70,18 +70,10 @@ router.post('/', upload.single('image'), (req, res, next) => {
 //   imageController.deleteAllImages(res);
 // });
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id/hash/:hash/image-str/:imageStr', (req, res, next) => {
   /**
     * #swagger.tags = ['Images - 圖片相關API']
     * #swagger.description = 'Delete Image API'
-    * #swagger.parameters['obj'] = {
-        in: 'body',
-        description: 'Should attach image hash',
-        schema: {
-          $hash: 'Image hash',
-          $imageUrl: 'Imgur image Url'
-        }
-      }
     * #swagger.responses[200] = {
         description: 'Response',
         schema: {

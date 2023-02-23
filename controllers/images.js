@@ -1,4 +1,5 @@
 const { ImgurClient } = require('imgur');
+const fetch = require('node-fetch');
 const httpStatusCodes = require('../constants/statusCode');
 const { successMsgs, errMsgs } = require('../constants/msgs');
 const Image = require('../models/imageModel');
@@ -50,17 +51,10 @@ const images = {
     }
   },
   deleteSingleImage: async (req, res) => {
-    const { id } = req.params;
-    const { hash, imageUrl } = req.body;
+    const { id, hash, imageStr } = req.params;
 
-    if (!id) {
+    if (!id || !hash || !imageStr) {
       errorHandle(res, { message: errMsgs.DELETE_IMAGE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
-
-      return;
-    }
-
-    if (!hash || !imageUrl) {
-      errorHandle(res, { message: errMsgs.DELETE_IMAGE_HASH_IMAGEURL_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
@@ -72,7 +66,7 @@ const images = {
         refreshToken: process.env.IMGUR_REFRESH_TOKEN,
       });
 
-      const { status } = await fetch(imageUrl);
+      const { status } = await fetch(`https://i.imgur.com/${imageStr}`);
 
       // something weird: if I remove some characters from the end of hash, it still can delete data from mongoDB
       // however, target image in imgur dashboard is still existed

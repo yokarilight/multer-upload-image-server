@@ -11,8 +11,7 @@ const successMsgs = {
 const errMsgs = {
   // images
   'POST_CREATE_SINGLE_IMAGE_FILE_REQUIRED': 'Image file is required',
-  'DELETE_IMAGE_ID_REQUIRED': 'Request params id is required',
-  'DELETE_IMAGE_HASH_IMAGEURL_REQUIRED': 'Key "hash" or key "imageUrl" is missing in request body',
+  'DELETE_IMAGE_ID_REQUIRED': 'Request params id or hash or imageStr is required',
   'CANNOT_FIND_THIS_IMAGE': 'Cannot find this image',
 
   // files

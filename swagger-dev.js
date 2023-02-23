@@ -5,8 +5,8 @@ const doc = {
     title: 'Signature Service API',
     description: 'This API doc is for Signature Service, including signature image and file CRUD.'
   },
-  host: 'auto-signature-app-v1.fly.dev',
-  schemes: ['https'],
+  host: 'localhost:8080',
+  schemes: ['http'],
 };
 
 const outputFile = './swagger-output.json';

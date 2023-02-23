@@ -5,10 +5,9 @@
     "description": "This API doc is for Signature Service, including signature image and file CRUD.",
     "version": "1.0.0"
   },
-  "host": "auto-signature-app.fly.dev",
+  "host": "auto-signature-app-v1.fly.dev",
   "basePath": "/",
   "schemes": [
-    "http",
     "https"
   ],
   "paths": {
@@ -98,7 +97,7 @@
         }
       }
     },
-    "/image/{id}": {
+    "/image/{id}/hash/{hash}/image-str/{imageStr}": {
       "delete": {
         "tags": [
           "Images - 圖片相關API"
@@ -112,26 +111,16 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "body",
-            "description": "Should attach image hash",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "hash": {
-                  "type": "string",
-                  "example": "Image hash"
-                },
-                "imageUrl": {
-                  "type": "string",
-                  "example": "Imgur image Url"
-                }
-              },
-              "required": [
-                "hash",
-                "imageUrl"
-              ]
-            }
+            "name": "hash",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "imageStr",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "responses": {
