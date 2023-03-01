@@ -54,10 +54,49 @@ const files = {
         fileKey: results[0].Key,
         fileEtag: results[0].ETag,
         fileBucket: results[0].Bucket,
+        isSigned: false,
       });
 
       await newFile.save();
       successHandle(res, successMsgs.POST_UPLOAD_FILES_SUCCESS);
+    }
+    catch (err) {
+      errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
+    }
+  },
+  updateFileStatus: async (req, res) => {
+    const { id } = req.params;
+    const { isSigned } = req.body;
+
+    if (!id) {
+      errorHandle(res, { message: errMsgs.PATCH_UPDATE_FILE_STATUS_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+
+      return;
+    }
+
+    if (!req.body.hasOwnProperty('isSigned')) {
+      errorHandle(res, { message: errMsgs.PATCH_UPDATE_FILE_STATUS_BODY_ISSIGNED_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+
+      return;
+    }
+
+    if (typeof isSigned !== 'boolean') {
+      errorHandle(res, { message: errMsgs.PATCH_UPDATE_FILE_STATUS_ISSIGNED_TYPE_ERROR }, httpStatusCodes.BAD_REQUEST);
+
+      return;
+    }
+
+    try {
+      const filter = {
+        id: id
+      };
+
+      const update = {
+        isSigned: isSigned
+      };
+
+      await File.findOneAndUpdate(filter, update);
+      successHandle(res, successMsgs.PATCH_UPDATE_FILE_STATUS_SUCCESS);
     }
     catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
@@ -79,8 +118,7 @@ const files = {
     }
   },
   deleteFiles: async (req, res) => {
-    const { id } = req.params;
-    const { filename } = req.body;
+    const { id, filename } = req.params;
 
     if (!id || !filename) {
       errorHandle(res, { message: errMsgs.DELETE_FILES_FILENAME_REQUIRED }, httpStatusCodes.BAD_REQUEST);

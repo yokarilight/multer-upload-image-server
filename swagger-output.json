@@ -240,6 +240,60 @@
         }
       }
     },
+    "/file/{id}": {
+      "patch": {
+        "tags": [
+          "Files - 文件相關API"
+        ],
+        "description": "Patch File API",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "obj",
+            "in": "body",
+            "description": "change boolean of isSigned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "isSigned": {
+                  "type": "boolean",
+                  "example": true
+                }
+              },
+              "required": [
+                "isSigned"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "data": {
+                  "type": "string",
+                  "example": "Update file successfully"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
     "/file/download": {
       "get": {
         "tags": [
@@ -268,7 +322,7 @@
         "responses": {}
       }
     },
-    "/file/{id}": {
+    "/file/{id}/filename/{filename}": {
       "delete": {
         "tags": [
           "Files - 文件相關API"
@@ -282,21 +336,10 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "body",
-            "description": "Should attach filename",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "filename": {
-                  "type": "string",
-                  "example": "Your filename"
-                }
-              },
-              "required": [
-                "filename"
-              ]
-            }
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "responses": {

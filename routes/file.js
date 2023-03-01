@@ -65,6 +65,28 @@ router.post('/', upload.array('file'), (req, res, next) => {
   fileController.uploadFiles(req, res);
 });
 
+router.patch('/:id', (req, res, next) => {
+  /**
+    * #swagger.tags = ['Files - 文件相關API']
+    * #swagger.description = 'Patch File API'
+    * #swagger.parameters['obj'] = {
+        in: 'body',
+        description: 'change boolean of isSigned',
+        schema: {
+          $isSigned: true,
+        }
+      }
+    * #swagger.responses[200] = {
+        description: 'Response',
+        schema: {
+          "status": true,
+          "data": "Update file successfully"
+        }
+      }
+    */
+  fileController.updateFileStatus(req, res);
+});
+
 router.get('/download', (req, res, next) => {
   /**
     * #swagger.tags = ['Files - 文件相關API']
@@ -90,17 +112,10 @@ router.get('/download', (req, res, next) => {
   fileController.downloadFiles(req, res);
 });
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id/filename/:filename', (req, res, next) => {
   /**
     * #swagger.tags = ['Files - 文件相關API']
     * #swagger.description = 'Delete File API'
-    * #swagger.parameters['obj'] = {
-        in: 'body',
-        description: 'Should attach filename',
-        schema: {
-          $filename: 'Your filename',
-        }
-      }
     * #swagger.responses[200] = {
         description: 'Response',
         schema: {

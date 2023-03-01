@@ -21,6 +21,9 @@ const fileSchema = new Schema({
   fileBucket: {
     type: String,
     required: [ true, 'file bucket is empty' ],
+  },
+  isSigned: {
+    type: Boolean,
   }
 });
 

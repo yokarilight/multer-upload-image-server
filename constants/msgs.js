@@ -5,6 +5,7 @@ const successMsgs = {
 
   // files
   'POST_UPLOAD_FILES_SUCCESS': 'Upload file successfully',
+  'PATCH_UPDATE_FILE_STATUS_SUCCESS': 'Update file status successfully',
   'DELETE_FILES_SUCCESS': 'Delete file successfully',
 };
 
@@ -16,7 +17,10 @@ const errMsgs = {
 
   // files
   'POST_UPLOAD_FILES_REQ_FILES_REQUIRED': 'No files uploaded',
-  'DELETE_FILES_FILENAME_REQUIRED': 'Request params id or request body filename is required',
+  'PATCH_UPDATE_FILE_STATUS_ID_REQUIRED': 'File id is required',
+  'PATCH_UPDATE_FILE_STATUS_BODY_ISSIGNED_REQUIRED': 'Request body isSigned is required',
+  'PATCH_UPDATE_FILE_STATUS_ISSIGNED_TYPE_ERROR': 'The type of the key isSigned in request body should be boolean',
+  'DELETE_FILES_FILENAME_REQUIRED': 'Request params id or filename is required',
 };
 
 module.exports = { successMsgs, errMsgs };
