@@ -16,6 +16,8 @@ const errMsgs = {
   'CANNOT_FIND_THIS_IMAGE': 'Cannot find this image',
 
   // files
+  'GET_FILES_FROM_ERROR': 'The key from in request body should be 0 or a natural number',
+  'GET_FILES_COUNT_ERROR': 'The key count in request body should be a natural number',
   'POST_UPLOAD_FILES_REQ_FILES_REQUIRED': 'No files uploaded',
   'PATCH_UPDATE_FILE_STATUS_ID_REQUIRED': 'File id is required',
   'PATCH_UPDATE_FILE_STATUS_BODY_ISSIGNED_REQUIRED': 'Request body isSigned is required',
