@@ -22,7 +22,7 @@ const upload = multer({
   }
 });
 
-router.get('/', (req, res, next) => {
+router.get('/from/:from/count/:count', (req, res, next) => {
   /**
    * #swagger.tags = ['Files - 文件相關API']
    * #swagger.description = 'Get All Files API'
@@ -41,7 +41,7 @@ router.get('/', (req, res, next) => {
       }
     }
     */
-  fileController.getFiles(res);
+  fileController.getFiles(req, res);
 });
 
 router.post('/', upload.array('file'), (req, res, next) => {

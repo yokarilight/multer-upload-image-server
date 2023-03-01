@@ -2,7 +2,7 @@ const { S3 } = require('aws-sdk');
 const httpStatusCodes = require('../constants/statusCode');
 const { successMsgs, errMsgs } = require('../constants/msgs');
 const File = require('../models/fileModel');
-const { isNaturalNumber } = require('../utils/utils');
+const { isNaturalNumber, isValidFrom } = require('../utils/utils');
 const successHandle = require('../utils/successHandler');
 const errorHandle = require('../utils/errorHandler');
 
@@ -31,15 +31,15 @@ const s3Uploadv2 = async (files) => {
 
 const files = {
   getFiles: async (req, res) => {
-    const { from, count } = req.body;
+    const { from, count } = req.params;
 
-    if (!isValidFrom(from)) {
+    if (!isValidFrom(Number(from))) {
       errorHandle(res, { message: errMsgs.GET_FILES_FROM_ERROR }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
 
-    if (!isNaturalNumber(count)) {
+    if (!isNaturalNumber(Number(count))) {
       errorHandle(res, { message: errMsgs.GET_FILES_COUNT_ERROR }, httpStatusCodes.BAD_REQUEST);
 
       return;

@@ -146,13 +146,26 @@
         }
       }
     },
-    "/file/": {
+    "/file/from/{from}/count/{count}": {
       "get": {
         "tags": [
           "Files - 文件相關API"
         ],
         "description": "Get All Files API",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "count",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Response",
@@ -202,7 +215,9 @@
             }
           }
         }
-      },
+      }
+    },
+    "/file/": {
       "post": {
         "tags": [
           "Files - 文件相關API"
