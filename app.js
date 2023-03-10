@@ -12,6 +12,7 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const imageRouter = require('./routes/image');
 const fileRouter = require('./routes/file');
+const changelogRouter = require('./routes/changelog');
 
 const app = express();
 require('./connections');
@@ -28,6 +29,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/image', imageRouter);
 app.use('/file', fileRouter);
+app.use('/changelog', changelogRouter);
 app.use('/api-doc', swaggerUI.serve, swaggerUI.setup(swaggerFile));
 
 // catch 404 and forward to error handler
