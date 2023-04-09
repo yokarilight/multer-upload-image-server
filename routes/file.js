@@ -17,6 +17,9 @@ const upload = multer({
       return cb(new Error('Only .pdf, .csv, .doc, .docx, .ppt, .pptx, .xls and .xlsx format allowed!'));
       // cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE'), false);
     }
+
+    // uploading filename should use utf-8 
+    file.originalname = decodeURIComponent(file.originalname)
     
     cb(undefined, true);
   }
@@ -37,6 +40,8 @@ router.get('/from/:from/count/:count', (req, res, next) => {
           "fileKey": "最高學習法心得.docx",
           "fileEtag": "\"15c0de85bce4f03fea5da6a77e0db16b\"",
           "fileBucket": "nodejs-signature-document-s3",
+          "isSigned": false,
+          "date": 1681046272553,
         }]
       }
     }
@@ -44,10 +49,33 @@ router.get('/from/:from/count/:count', (req, res, next) => {
   fileController.getFiles(req, res);
 });
 
+router.get('/:id', (req, res, next) => {
+  /**
+    * #swagger.tags = ['Files - 文件相關API']
+    * #swagger.description = 'Get Single File API'
+    * #swagger.responses[200] = {
+        description: 'Response',
+        schema: {
+          "status": true,
+          "data": {
+          "_id": "63d13d5a2782fdfa5e2f239d",
+          "fileLocation": "https://nodejs-signature-document-s3.s3.amazonaws.com/%E6%9C%80%E9%AB%98%E5%AD%B8%E7%BF%92%E6%B3%95%E5%BF%83%E5%BE%97.docx",
+          "fileName": "最高學習法心得.docx",
+          "fileKey": "最高學習法心得.docx",
+          "fileEtag": "\"15c0de85bce4f03fea5da6a77e0db16b\"",
+          "fileBucket": "nodejs-signature-document-s3",
+          "isSigned": false,
+          "date": 1681046272553,
+        }}
+      }
+    */
+  fileController.getSingleFile(req, res);
+});
+
 router.post('/', upload.array('file'), (req, res, next) => {
   /**
     * #swagger.tags = ['Files - 文件相關API']
-    * #swagger.description = 'Upload File API'
+    * #swagger.description = 'Save File Draft API'
     * #swagger.parameters['file'] = {
         in: 'formData',
         type: 'file',
@@ -62,7 +90,7 @@ router.post('/', upload.array('file'), (req, res, next) => {
         }
       }
     */
-  fileController.uploadFiles(req, res);
+  fileController.saveFileDraft(req, res);
 });
 
 router.patch('/:id', (req, res, next) => {

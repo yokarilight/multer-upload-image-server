@@ -16,5 +16,8 @@ function isValidFrom(n) {
   return (n >= 0.0) && (Math.floor(n) === n) && n !== Infinity;
 }
 
+function getTimeNow() {
+  return new Date().getTime();
+}
 
-module.exports = { isNaturalNumber, isValidFrom };
+module.exports = { isNaturalNumber, isValidFrom, getTimeNow };

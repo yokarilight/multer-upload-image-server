@@ -2,7 +2,7 @@ const { S3 } = require('aws-sdk');
 const httpStatusCodes = require('../constants/statusCode');
 const { successMsgs, errMsgs } = require('../constants/msgs');
 const File = require('../models/fileModel');
-const { isNaturalNumber, isValidFrom } = require('../utils/utils');
+const { isNaturalNumber, isValidFrom, getTimeNow } = require('../utils/utils');
 const successHandle = require('../utils/successHandler');
 const errorHandle = require('../utils/errorHandler');
 
@@ -53,7 +53,26 @@ const files = {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }
   },
-  uploadFiles: async (req, res) => {
+  getSingleFile: async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+      errorHandle(res, { message: errMsgs.GET_SINGLE_FILE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+
+      return;
+    }
+
+    try {
+      const targetFile = await File.findOne({
+        '_id': id
+      });
+      successHandle(res, targetFile);
+    }
+    catch (err) {
+      errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
+    }
+  },
+  saveFileDraft: async (req, res) => {
     if (!req.files.length) {
       errorHandle(res, { message: errMsgs.POST_UPLOAD_FILES_REQ_FILES_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
@@ -61,21 +80,26 @@ const files = {
     }
 
     try {
+      // TODO: whether to store new file or not
       const results = await s3Uploadv2(req.files);
 
       const newFile = new File({
+        // TODO: add signature object title
+        // title: req.body.title,
         fileLocation: results[0].Location,
         fileName: req.files[0].originalname,
         fileKey: results[0].Key,
         fileEtag: results[0].ETag,
         fileBucket: results[0].Bucket,
         isSigned: false,
+        date: getTimeNow(),
       });
 
       await newFile.save();
       successHandle(res, successMsgs.POST_UPLOAD_FILES_SUCCESS);
     }
     catch (err) {
+      console.log('err', err)
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }
   },
