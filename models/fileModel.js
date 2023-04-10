@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const fileSchema = new Schema({
+  signTitle: {
+    type: String,
+    required: [ true, 'sign title is empty' ],
+  },
   fileLocation: {
     type: String,
     required: [ true, 'file location is empty' ],
@@ -24,6 +28,15 @@ const fileSchema = new Schema({
   },
   isSigned: {
     type: Boolean,
+    required: [ true, 'isSigned is empty' ],
+  },
+  date: {
+    type: Number,
+    required: [ true, 'date is empty' ],
+  },
+  modifiedDate: {
+    type: Number,
+    required: [ true, 'modified date is empty' ],
   }
 });
 

@@ -20,4 +20,23 @@ function getTimeNow() {
   return new Date().getTime();
 }
 
-module.exports = { isNaturalNumber, isValidFrom, getTimeNow };
+function checkQueryParamIsBool(value) {
+  if ((value + '').toLowerCase() === 'true') {
+    return true;
+  }
+
+  if ((value + '').toLowerCase() === 'false') {
+    return true;
+  }
+
+  return false;
+}
+
+/* convert boolean query string */
+/* e.g. isSigned=true ===> return true */
+/* e.g. isSigned=false ===> return false */
+function queryParamToBool(value) {
+  return ((value + '').toLowerCase() === 'true');
+}
+
+module.exports = { isNaturalNumber, isValidFrom, getTimeNow, checkQueryParamIsBool, queryParamToBool };

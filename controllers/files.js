@@ -2,7 +2,7 @@ const { S3 } = require('aws-sdk');
 const httpStatusCodes = require('../constants/statusCode');
 const { successMsgs, errMsgs } = require('../constants/msgs');
 const File = require('../models/fileModel');
-const { isNaturalNumber, isValidFrom, getTimeNow } = require('../utils/utils');
+const { isNaturalNumber, isValidFrom, getTimeNow, checkQueryParamIsBool, queryParamToBool } = require('../utils/utils');
 const successHandle = require('../utils/successHandler');
 const errorHandle = require('../utils/errorHandler');
 
@@ -72,85 +72,86 @@ const files = {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }
   },
-  saveFileDraft: async (req, res) => {
+  createFileDraft: async (req, res) => {
+    // if (!req.body.title) {
+    //   errorHandle(res, { message: errMsgs.CREATE_FILE_DRAFT_TITLE_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+
+    //   return;
+    // }
+
     if (!req.files.length) {
-      errorHandle(res, { message: errMsgs.POST_UPLOAD_FILES_REQ_FILES_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+      errorHandle(res, { message: errMsgs.CREATE_FILE_DRAFT_REQ_FILES_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
 
     try {
-      // TODO: whether to store new file or not
       const results = await s3Uploadv2(req.files);
+      const timeNow = getTimeNow();
 
       const newFile = new File({
-        // TODO: add signature object title
-        // title: req.body.title,
+        signTitle: req.body.title ? req.body.title : `${new Date(timeNow).toLocaleString()}-example`,
         fileLocation: results[0].Location,
         fileName: req.files[0].originalname,
         fileKey: results[0].Key,
         fileEtag: results[0].ETag,
         fileBucket: results[0].Bucket,
         isSigned: false,
-        date: getTimeNow(),
+        date: timeNow,
+        modifiedDate: timeNow,
       });
 
       await newFile.save();
-      successHandle(res, successMsgs.POST_UPLOAD_FILES_SUCCESS);
+      successHandle(res, successMsgs.CREATE_FILE_DRAFT_SUCCESS);
     }
     catch (err) {
-      console.log('err', err)
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }
   },
-  updateFileStatus: async (req, res) => {
+  updateFile: async (req, res) => {
     const { id } = req.params;
-    const { isSigned } = req.body;
+
+    const { 'title': newTitle, 'isSigned': newSignedStatus } = req.query;
 
     if (!id) {
-      errorHandle(res, { message: errMsgs.PATCH_UPDATE_FILE_STATUS_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+      errorHandle(res, { message: errMsgs.PATCH_UPDATE_FILE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
 
-    if (!req.body.hasOwnProperty('isSigned')) {
-      errorHandle(res, { message: errMsgs.PATCH_UPDATE_FILE_STATUS_BODY_ISSIGNED_REQUIRED }, httpStatusCodes.BAD_REQUEST);
-
-      return;
-    }
-
-    if (typeof isSigned !== 'boolean') {
-      errorHandle(res, { message: errMsgs.PATCH_UPDATE_FILE_STATUS_ISSIGNED_TYPE_ERROR }, httpStatusCodes.BAD_REQUEST);
+    if (newSignedStatus && !checkQueryParamIsBool(newSignedStatus)) {
+      errorHandle(res, { message: errMsgs.PATCH_UPDATE_FILE_QUERY_STRING_ISSIGNED_ERROR }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
 
     try {
+      const targetFile = await File.findOne({
+        '_id': id
+      });
+
       const filter = {
         id: id
       };
 
       const update = {
-        isSigned: isSigned
+        signTitle: newTitle ? newTitle : targetFile.signTitle,
+        isSigned: newSignedStatus ? queryParamToBool(newSignedStatus) : targetFile.isSigned,
+        modifiedDate: getTimeNow(),
       };
 
-      await File.findOneAndUpdate(filter, update);
-      successHandle(res, successMsgs.PATCH_UPDATE_FILE_STATUS_SUCCESS);
-    }
-    catch (err) {
-      errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
-    }
-  },
-  downloadFiles: async (req, res) => {
-    const { filename } = req.body;
-    
-    try {
-      const x = await s3.getObject({
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: filename,
-      }).promise();
+      if (req?.files?.length) {
+        const results = await s3Uploadv2(req.files);
 
-      successHandle(res, x.Body);
+        update.fileLocation = results[0].Location;
+        update.fileName = req.files[0].originalname;
+        update.fileKey = results[0].Key;
+        update.fileEtag = results[0].ETag;
+        update.fileBucket = results[0].Bucket;
+      }
+
+      await File.findOneAndUpdate(filter, update);
+      successHandle(res, successMsgs.PATCH_UPDATE_FILE_SUCCESS);
     }
     catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);

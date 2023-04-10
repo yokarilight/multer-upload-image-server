@@ -9,9 +9,9 @@ const path = require('path');
 // swagger when ignore is equal to true, this api will not generate on the page
 router.get('/', function(req, res, next) {
   // #swagger.ignore = true
-	const changelogPath = path.join(__dirname, '../changelog.md');
-	fs.readFileSync(changelogPath, 'utf-8', (err, result) => {
-		res.send(result);
+  const changelogPath = path.join(__dirname, '../changelog.md');
+  fs.readFileSync(changelogPath, 'utf-8', (err, result) => {
+    res.send(result);
  });
 });
 
