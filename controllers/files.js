@@ -79,6 +79,8 @@ const files = {
     //   return;
     // }
 
+    const { title } = req.query;
+
     if (!req.files.length) {
       errorHandle(res, { message: errMsgs.CREATE_FILE_DRAFT_REQ_FILES_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
@@ -90,7 +92,7 @@ const files = {
       const timeNow = getTimeNow();
 
       const newFile = new File({
-        signTitle: req.body.title ? req.body.title : `${new Date(timeNow).toLocaleString()}-example`,
+        signTitle: title ? title : `${new Date(timeNow).toLocaleString()}-example`,
         fileLocation: results[0].Location,
         fileName: req.files[0].originalname,
         fileKey: results[0].Key,

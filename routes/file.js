@@ -80,6 +80,10 @@ router.post('/', upload.array('file'), (req, res, next) => {
   /**
     * #swagger.tags = ['Files - 文件相關API']
     * #swagger.description = 'Create File Draft API'
+    * #swagger.parameters['title'] = {
+        in: 'query',
+        description: '簽署物件標題',
+      }
     * #swagger.parameters['file'] = {
         in: 'formData',
         type: 'file',
@@ -101,13 +105,18 @@ router.patch('/:id', upload.array('file'), (req, res, next) => {
   /**
     * #swagger.tags = ['Files - 文件相關API']
     * #swagger.description = 'Patch File API'
-    * #swagger.parameters['obj'] = {
-        in: 'body',
-        description: 'change boolean of isSigned',
-        schema: {
-          $title: 'new title',
-          $isSigned: true,
-        }
+    * #swagger.parameters['title'] = {
+        in: 'query',
+        description: '簽署物件標題',
+      }
+    * #swagger.parameters['isSigned'] = {
+        in: 'query',
+        description: 'isSigned文件簽署狀態',
+      }
+    * #swagger.parameters['file'] = {
+        in: 'formData',
+        type: 'file',
+        description: 'Single file that you upload',
       }
     * #swagger.responses[200] = {
         description: 'Response',

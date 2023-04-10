@@ -5,7 +5,7 @@
     "description": "This API doc is for Signature Service, including signature image and file CRUD.",
     "version": "1.0.0"
   },
-  "host": "auto-signature-app-v3.fly.dev",
+  "host": "auto-signature-app-v4.fly.dev",
   "basePath": "/",
   "schemes": [
     "https"
@@ -185,6 +185,10 @@
                         "type": "string",
                         "example": "63d13d5a2782fdfa5e2f239d"
                       },
+                      "signTitle": {
+                        "type": "string",
+                        "example": "example"
+                      },
                       "fileLocation": {
                         "type": "string",
                         "example": "https://nodejs-signature-document-s3.s3.amazonaws.com/%E6%9C%80%E9%AB%98%E5%AD%B8%E7%BF%92%E6%B3%95%E5%BF%83%E5%BE%97.docx"
@@ -204,6 +208,18 @@
                       "fileBucket": {
                         "type": "string",
                         "example": "nodejs-signature-document-s3"
+                      },
+                      "isSigned": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "date": {
+                        "type": "number",
+                        "example": 1681046272553
+                      },
+                      "modifiedDate": {
+                        "type": "number",
+                        "example": 1681046272553
                       }
                     }
                   }
@@ -217,19 +233,18 @@
         }
       }
     },
-    "/file/": {
-      "post": {
+    "/file/{id}": {
+      "get": {
         "tags": [
           "Files - 文件相關API"
         ],
-        "description": "Upload File API",
+        "description": "Get Single File API",
         "parameters": [
           {
-            "name": "file",
-            "in": "formData",
-            "type": "file",
+            "name": "id",
+            "in": "path",
             "required": true,
-            "description": "Single file that you upload"
+            "type": "string"
           }
         ],
         "responses": {
@@ -243,8 +258,49 @@
                   "example": true
                 },
                 "data": {
-                  "type": "string",
-                  "example": "Upload file successfully"
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "string",
+                      "example": "63d13d5a2782fdfa5e2f239d"
+                    },
+                    "signTitle": {
+                      "type": "string",
+                      "example": "example"
+                    },
+                    "fileLocation": {
+                      "type": "string",
+                      "example": "https://nodejs-signature-document-s3.s3.amazonaws.com/%E6%9C%80%E9%AB%98%E5%AD%B8%E7%BF%92%E6%B3%95%E5%BF%83%E5%BE%97.docx"
+                    },
+                    "fileName": {
+                      "type": "string",
+                      "example": "最高學習法心得.docx"
+                    },
+                    "fileKey": {
+                      "type": "string",
+                      "example": "最高學習法心得.docx"
+                    },
+                    "fileEtag": {
+                      "type": "string",
+                      "example": "\"15c0de85bce4f03fea5da6a77e0db16b\""
+                    },
+                    "fileBucket": {
+                      "type": "string",
+                      "example": "nodejs-signature-document-s3"
+                    },
+                    "isSigned": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "date": {
+                      "type": "number",
+                      "example": 1681046272553
+                    },
+                    "modifiedDate": {
+                      "type": "number",
+                      "example": 1681046272553
+                    }
+                  }
                 }
               },
               "xml": {
@@ -253,9 +309,7 @@
             }
           }
         }
-      }
-    },
-    "/file/{id}": {
+      },
       "patch": {
         "tags": [
           "Files - 文件相關API"
@@ -269,21 +323,22 @@
             "type": "string"
           },
           {
-            "name": "obj",
-            "in": "body",
-            "description": "change boolean of isSigned",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "isSigned": {
-                  "type": "boolean",
-                  "example": true
-                }
-              },
-              "required": [
-                "isSigned"
-              ]
-            }
+            "name": "title",
+            "in": "query",
+            "description": "簽署物件標題",
+            "type": "string"
+          },
+          {
+            "name": "isSigned",
+            "in": "query",
+            "description": "isSigned文件簽署狀態",
+            "type": "string"
+          },
+          {
+            "name": "file",
+            "in": "formData",
+            "type": "file",
+            "description": "Single file that you upload"
           }
         ],
         "responses": {
@@ -309,32 +364,48 @@
         }
       }
     },
-    "/file/download": {
-      "get": {
+    "/file/": {
+      "post": {
         "tags": [
           "Files - 文件相關API"
         ],
-        "description": "Download File API",
+        "description": "Create File Draft API",
         "parameters": [
           {
-            "name": "obj",
-            "in": "body",
-            "description": "Should attach filename",
+            "name": "title",
+            "in": "query",
+            "description": "簽署物件標題",
+            "type": "string"
+          },
+          {
+            "name": "file",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Single file that you upload"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
             "schema": {
               "type": "object",
               "properties": {
-                "filename": {
+                "status": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "data": {
                   "type": "string",
-                  "example": "Your filename"
+                  "example": "Create draft successfully"
                 }
               },
-              "required": [
-                "filename"
-              ]
+              "xml": {
+                "name": "main"
+              }
             }
           }
-        ],
-        "responses": {}
+        }
       }
     },
     "/file/{id}/filename/{filename}": {
