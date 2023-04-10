@@ -79,10 +79,14 @@ router.get('/:id', (req, res, next) => {
 router.post('/', upload.array('file'), (req, res, next) => {
   /**
     * #swagger.tags = ['Files - 文件相關API']
-    * #swagger.description = 'Create File Draft API'
+    * #swagger.description = 'Create Signature File API'
     * #swagger.parameters['title'] = {
         in: 'query',
         description: '簽署物件標題',
+      }
+    * #swagger.parameters['isSigned'] = {
+        in: 'query',
+        description: 'isSigned文件簽署狀態',
       }
     * #swagger.parameters['file'] = {
         in: 'formData',
@@ -94,11 +98,11 @@ router.post('/', upload.array('file'), (req, res, next) => {
         description: 'Response',
         schema: {
           "status": true,
-          "data": "Create draft successfully"
+          "data": "Create successfully"
         }
       }
     */
-  fileController.createFileDraft(req, res);
+  fileController.createSignatureFile(req, res);
 });
 
 router.patch('/:id', upload.array('file'), (req, res, next) => {

@@ -72,17 +72,23 @@ const files = {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }
   },
-  createFileDraft: async (req, res) => {
+  createSignatureFile: async (req, res) => {
     // if (!req.body.title) {
-    //   errorHandle(res, { message: errMsgs.CREATE_FILE_DRAFT_TITLE_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+    //   errorHandle(res, { message: errMsgs.CREATE_FILE_SIGN_TITLE_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
     //   return;
     // }
 
-    const { title } = req.query;
+    const { title, isSigned } = req.query;
 
     if (!req.files.length) {
-      errorHandle(res, { message: errMsgs.CREATE_FILE_DRAFT_REQ_FILES_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+      errorHandle(res, { message: errMsgs.CREATE_FILE_SIGN_REQ_FILES_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+
+      return;
+    }
+
+    if (isSigned && !checkQueryParamIsBool(isSigned)) {
+      errorHandle(res, { message: errMsgs.CREATE_FILE_SIGN_QUERY_STRING_ISSIGNED_ERROR }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
@@ -98,7 +104,7 @@ const files = {
         fileKey: results[0].Key,
         fileEtag: results[0].ETag,
         fileBucket: results[0].Bucket,
-        isSigned: false,
+        isSigned: isSigned ? queryParamToBool(isSigned) : false,
         date: timeNow,
         modifiedDate: timeNow,
       });

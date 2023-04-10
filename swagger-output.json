@@ -5,7 +5,7 @@
     "description": "This API doc is for Signature Service, including signature image and file CRUD.",
     "version": "1.0.0"
   },
-  "host": "auto-signature-app-v4.fly.dev",
+  "host": "auto-signature-app-v5.fly.dev",
   "basePath": "/",
   "schemes": [
     "https"
@@ -369,12 +369,18 @@
         "tags": [
           "Files - 文件相關API"
         ],
-        "description": "Create File Draft API",
+        "description": "Create Signature File API",
         "parameters": [
           {
             "name": "title",
             "in": "query",
             "description": "簽署物件標題",
+            "type": "string"
+          },
+          {
+            "name": "isSigned",
+            "in": "query",
+            "description": "isSigned文件簽署狀態",
             "type": "string"
           },
           {
@@ -397,7 +403,7 @@
                 },
                 "data": {
                   "type": "string",
-                  "example": "Create draft successfully"
+                  "example": "Create successfully"
                 }
               },
               "xml": {
