@@ -29,6 +29,31 @@ const s3Uploadv2 = async (files) => {
   return await Promise.all(params.map((param) => s3.upload(param).promise()));
 }
 
+const checkDuplicateFile = async (req, res) => {
+  const existFile = await File.findOne({
+    'fileName': req.files[0].originalname
+  });
+
+  if (existFile) {
+    errorHandle(res, { message: `${existFile.fileName} ${errMsgs.DUPLICATE_FILE_NAME}` }, httpStatusCodes.BAD_REQUEST);
+
+    return;
+  }
+}
+
+const checkDuplicateTitle = async (title, res) => {
+  console.log('checkDuplicateTitle title', title)
+  const existFile = await File.findOne({
+    'signTitle': title
+  });
+
+  if (existFile) {
+    errorHandle(res, { message: errMsgs.DUPLICATE_TITLE }, httpStatusCodes.BAD_REQUEST);
+
+    return;
+  }
+}
+
 const files = {
   getFiles: async (req, res) => {
     const { from, count } = req.params;
@@ -57,7 +82,7 @@ const files = {
     const { id } = req.params;
 
     if (!id) {
-      errorHandle(res, { message: errMsgs.GET_SINGLE_FILE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+      errorHandle(res, { message: errMsgs.FILE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
@@ -79,6 +104,9 @@ const files = {
     //   return;
     // }
 
+    // if duplicate title or fileName is found, set isExist to true, then return error
+    // let isExist = false;
+
     const { title, isSigned } = req.query;
 
     if (!req.files.length) {
@@ -88,10 +116,36 @@ const files = {
     }
 
     if (isSigned && !checkQueryParamIsBool(isSigned)) {
-      errorHandle(res, { message: errMsgs.CREATE_FILE_SIGN_QUERY_STRING_ISSIGNED_ERROR }, httpStatusCodes.BAD_REQUEST);
+      errorHandle(res, { message: errMsgs.QUERY_STRING_ISSIGNED_ERROR }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
+
+    // checkDuplicateFile(req, res);
+    const existFile = await File.findOne({
+      'fileName': req.files[0].originalname
+    });
+  
+    if (existFile) {
+      errorHandle(res, { message: `${existFile.fileName} ${errMsgs.DUPLICATE_FILE_NAME}` }, httpStatusCodes.BAD_REQUEST);
+  
+      return;
+    }
+
+    // checkDuplicateTitle(title, res);
+    const existFileObj = await File.findOne({
+      'signTitle': title
+    });
+  
+    if (existFileObj) {
+      errorHandle(res, { message: errMsgs.DUPLICATE_TITLE }, httpStatusCodes.BAD_REQUEST);
+  
+      return;
+    }
+
+    // if (isExist) {
+    //   return;
+    // }
 
     try {
       const results = await s3Uploadv2(req.files);
@@ -110,7 +164,7 @@ const files = {
       });
 
       await newFile.save();
-      successHandle(res, successMsgs.CREATE_FILE_DRAFT_SUCCESS);
+      successHandle(res, successMsgs.CREATE_FILE_SUCCESS);
     }
     catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
@@ -119,16 +173,16 @@ const files = {
   updateFile: async (req, res) => {
     const { id } = req.params;
 
-    const { 'title': newTitle, 'isSigned': newSignedStatus } = req.query;
+    const { title, isSigned } = req.query;
 
     if (!id) {
-      errorHandle(res, { message: errMsgs.PATCH_UPDATE_FILE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+      errorHandle(res, { message: errMsgs.FILE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
 
-    if (newSignedStatus && !checkQueryParamIsBool(newSignedStatus)) {
-      errorHandle(res, { message: errMsgs.PATCH_UPDATE_FILE_QUERY_STRING_ISSIGNED_ERROR }, httpStatusCodes.BAD_REQUEST);
+    if (isSigned && !checkQueryParamIsBool(isSigned)) {
+      errorHandle(res, { message: errMsgs.QUERY_STRING_ISSIGNED_ERROR }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
@@ -143,7 +197,7 @@ const files = {
       };
 
       const update = {
-        signTitle: newTitle ? newTitle : targetFile.signTitle,
+        signTitle: title ? title : targetFile.signTitle,
         isSigned: newSignedStatus ? queryParamToBool(newSignedStatus) : targetFile.isSigned,
         modifiedDate: getTimeNow(),
       };
