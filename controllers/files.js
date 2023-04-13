@@ -42,7 +42,6 @@ const checkDuplicateFile = async (req, res) => {
 }
 
 const checkDuplicateTitle = async (title, res) => {
-  console.log('checkDuplicateTitle title', title)
   const existFile = await File.findOne({
     'signTitle': title
   });
@@ -104,9 +103,6 @@ const files = {
     //   return;
     // }
 
-    // if duplicate title or fileName is found, set isExist to true, then return error
-    // let isExist = false;
-
     const { title, isSigned } = req.query;
 
     if (!req.files.length) {
@@ -142,10 +138,6 @@ const files = {
   
       return;
     }
-
-    // if (isExist) {
-    //   return;
-    // }
 
     try {
       const results = await s3Uploadv2(req.files);
@@ -187,18 +179,38 @@ const files = {
       return;
     }
 
+    const existFile = await File.findOne({
+      'fileName': req?.files?.[0]?.originalname
+    });
+  
+    if (existFile) {
+      errorHandle(res, { message: `${existFile.fileName} ${errMsgs.DUPLICATE_FILE_NAME}` }, httpStatusCodes.BAD_REQUEST);
+  
+      return;
+    }
+
+    const existFileObj = await File.findOne({
+      'signTitle': title
+    });
+  
+    if (existFileObj) {
+      errorHandle(res, { message: errMsgs.DUPLICATE_TITLE }, httpStatusCodes.BAD_REQUEST);
+  
+      return;
+    }
+
     try {
       const targetFile = await File.findOne({
         '_id': id
       });
 
       const filter = {
-        id: id
+        '_id': id
       };
 
       const update = {
-        signTitle: title ? title : targetFile.signTitle,
-        isSigned: newSignedStatus ? queryParamToBool(newSignedStatus) : targetFile.isSigned,
+        signTitle: title || targetFile.signTitle,
+        isSigned: isSigned ? queryParamToBool(isSigned) : targetFile.isSigned,
         modifiedDate: getTimeNow(),
       };
 
