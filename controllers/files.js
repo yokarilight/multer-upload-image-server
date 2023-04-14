@@ -55,7 +55,7 @@ const checkDuplicateTitle = async (title, res) => {
 
 const files = {
   getFiles: async (req, res) => {
-    const { from, count } = req.params;
+    const { from, count } = req.query;
 
     if (!isValidFrom(Number(from))) {
       errorHandle(res, { message: errMsgs.GET_FILES_FROM_ERROR }, httpStatusCodes.BAD_REQUEST);
@@ -70,8 +70,14 @@ const files = {
     }
 
     try {
+      const allFilesSize = await File.count();
       const allFiles = await File.find().skip(from).limit(count);
-      successHandle(res, allFiles);
+      const data = {
+        'data': allFiles,
+        'size': allFilesSize
+      };
+
+      successHandle(res, data);
     }
     catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
@@ -90,6 +96,13 @@ const files = {
       const targetFile = await File.findOne({
         '_id': id
       });
+
+      if (targetFile === null) {
+        errorHandle(res, { message: errMsgs.NO_FILE_FOUND }, httpStatusCodes.BAD_REQUEST);
+
+        return;
+      }
+
       successHandle(res, targetFile);
     }
     catch (err) {
@@ -97,27 +110,12 @@ const files = {
     }
   },
   createSignatureFile: async (req, res) => {
-    // if (!req.body.title) {
-    //   errorHandle(res, { message: errMsgs.CREATE_FILE_SIGN_TITLE_REQUIRED }, httpStatusCodes.BAD_REQUEST);
-
-    //   return;
-    // }
-
-    const { title, isSigned } = req.query;
-
     if (!req.files.length) {
       errorHandle(res, { message: errMsgs.CREATE_FILE_SIGN_REQ_FILES_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
 
-    if (isSigned && !checkQueryParamIsBool(isSigned)) {
-      errorHandle(res, { message: errMsgs.QUERY_STRING_ISSIGNED_ERROR }, httpStatusCodes.BAD_REQUEST);
-
-      return;
-    }
-
-    // checkDuplicateFile(req, res);
     const existFile = await File.findOne({
       'fileName': req.files[0].originalname
     });
@@ -128,44 +126,34 @@ const files = {
       return;
     }
 
-    // checkDuplicateTitle(title, res);
-    const existFileObj = await File.findOne({
-      'signTitle': title
-    });
-  
-    if (existFileObj) {
-      errorHandle(res, { message: errMsgs.DUPLICATE_TITLE }, httpStatusCodes.BAD_REQUEST);
-  
-      return;
-    }
-
     try {
       const results = await s3Uploadv2(req.files);
       const timeNow = getTimeNow();
 
       const newFile = new File({
-        signTitle: title ? title : `${new Date(timeNow).toLocaleString()}-example`,
+        signTitle: `${new Date(timeNow).toLocaleString()}-example`,
         fileLocation: results[0].Location,
         fileName: req.files[0].originalname,
         fileKey: results[0].Key,
         fileEtag: results[0].ETag,
         fileBucket: results[0].Bucket,
-        isSigned: isSigned ? queryParamToBool(isSigned) : false,
+        isSigned: false,
         date: timeNow,
         modifiedDate: timeNow,
       });
 
       await newFile.save();
-      successHandle(res, successMsgs.CREATE_FILE_SUCCESS);
+      successHandle(res, successMsgs.POST_CREATE_SUCCESS);
     }
     catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
     }
   },
-  updateFile: async (req, res) => {
+  // update only title and isSigned
+  updateSignatureInfo: async (req, res) => {
     const { id } = req.params;
 
-    const { title, isSigned } = req.query;
+    const { title, isSigned } = req.body;
 
     if (!id) {
       errorHandle(res, { message: errMsgs.FILE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
@@ -173,8 +161,62 @@ const files = {
       return;
     }
 
-    if (isSigned && !checkQueryParamIsBool(isSigned)) {
-      errorHandle(res, { message: errMsgs.QUERY_STRING_ISSIGNED_ERROR }, httpStatusCodes.BAD_REQUEST);
+    if (isSigned === false) {
+      errorHandle(res, { message: errMsgs.CANNOT_CHANGE_SIGN_STATUS_TO_UNFINISHED }, httpStatusCodes.BAD_REQUEST);
+
+      return;
+    }
+
+    if (isSigned && typeof isSigned !== 'boolean') {
+      errorHandle(res, { message: errMsgs.ISSIGNED_SHOULD_BE_BOOLEAN }, httpStatusCodes.BAD_REQUEST);
+
+      return;
+    }
+
+    const existFile = await File.findOne({
+      'signTitle': title
+    });
+  
+    if (existFile) {
+      errorHandle(res, { message: errMsgs.DUPLICATE_TITLE }, httpStatusCodes.BAD_REQUEST);
+  
+      return;
+    }
+
+    const targetFile = await File.findOne({
+      '_id': id
+    });
+
+    if (targetFile === null) {
+      errorHandle(res, { message: errMsgs.NO_FILE_FOUND }, httpStatusCodes.BAD_REQUEST);
+
+      return;
+    }
+
+    try {
+      const filter = {
+        '_id': id
+      };
+
+      const update = {
+        signTitle: title || targetFile.signTitle,
+        isSigned: isSigned ?? targetFile.isSigned,
+        modifiedDate: getTimeNow(),
+      };
+
+      await File.findOneAndUpdate(filter, update);
+      successHandle(res, successMsgs.PATCH_UPDATE_SUCCESS);
+    }
+    catch (err) {
+      errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
+    }
+  },
+  // reupload new file
+  updateFileInfo: async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+      errorHandle(res, { message: errMsgs.FILE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
@@ -189,43 +231,34 @@ const files = {
       return;
     }
 
-    const existFileObj = await File.findOne({
-      'signTitle': title
+    const targetFile = await File.findOne({
+      '_id': id
     });
-  
-    if (existFileObj) {
-      errorHandle(res, { message: errMsgs.DUPLICATE_TITLE }, httpStatusCodes.BAD_REQUEST);
-  
+
+    if (targetFile === null) {
+      errorHandle(res, { message: errMsgs.NO_FILE_FOUND }, httpStatusCodes.BAD_REQUEST);
+
       return;
     }
 
     try {
-      const targetFile = await File.findOne({
-        '_id': id
-      });
-
       const filter = {
         '_id': id
       };
 
+      const results = await s3Uploadv2(req.files);
+
       const update = {
-        signTitle: title || targetFile.signTitle,
-        isSigned: isSigned ? queryParamToBool(isSigned) : targetFile.isSigned,
+        fileLocation: results[0].Location,
+        fileName: req.files[0].originalname,
+        fileKey: results[0].Key,
+        fileEtag: results[0].ETag,
+        fileBucket: results[0].Bucket,
         modifiedDate: getTimeNow(),
       };
 
-      if (req?.files?.length) {
-        const results = await s3Uploadv2(req.files);
-
-        update.fileLocation = results[0].Location;
-        update.fileName = req.files[0].originalname;
-        update.fileKey = results[0].Key;
-        update.fileEtag = results[0].ETag;
-        update.fileBucket = results[0].Bucket;
-      }
-
       await File.findOneAndUpdate(filter, update);
-      successHandle(res, successMsgs.PATCH_UPDATE_FILE_SUCCESS);
+      successHandle(res, successMsgs.PATCH_UPDATE_SUCCESS);
     }
     catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);
@@ -246,7 +279,7 @@ const files = {
 
       await File.findByIdAndDelete(id);
 
-      successHandle(res, successMsgs.DELETE_FILES_SUCCESS);
+      successHandle(res, successMsgs.DELETE_SUCCESS);
     }
     catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);

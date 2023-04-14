@@ -4,9 +4,9 @@ const successMsgs = {
   'DELETE_IMAGES_SUCCESS': 'Delete image successfully',
 
   // files
-  'CREATE_FILE_SUCCESS': 'Create successfully',
-  'PATCH_UPDATE_FILE_SUCCESS': 'Update file successfully',
-  'DELETE_FILES_SUCCESS': 'Delete file successfully',
+  'POST_CREATE_SUCCESS': 'Create successfully',
+  'PATCH_UPDATE_SUCCESS': 'Update successfully',
+  'DELETE_SUCCESS': 'Delete successfully',
 };
 
 const errMsgs = {
@@ -20,10 +20,12 @@ const errMsgs = {
   // File XXX is already exist. Please...
   'DUPLICATE_FILE_NAME': 'is already existed. Please change your file name',
   'DUPLICATE_TITLE': 'This title is already existed. Please change another title',
-  'QUERY_STRING_ISSIGNED_ERROR': 'Query string isSigned should attach string, true or false',
+  'ISSIGNED_SHOULD_BE_BOOLEAN': 'isSigned should be a boolean in request body',
+  'CANNOT_CHANGE_SIGN_STATUS_TO_UNFINISHED': 'Cannot change signature status to unfinished',
 
   'GET_FILES_FROM_ERROR': 'The key from in request body should be 0 or a natural number',
   'GET_FILES_COUNT_ERROR': 'The key count in request body should be a natural number',
+  'NO_FILE_FOUND': 'No file found',
   'CREATE_FILE_SIGN_TITLE_REQUIRED': 'Title is required',
   'CREATE_FILE_SIGN_REQ_FILES_REQUIRED': 'No files uploaded',
   'DELETE_FILES_FILENAME_REQUIRED': 'Request params id or filename is required',
