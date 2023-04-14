@@ -17,6 +17,9 @@ const changelogRouter = require('./routes/changelog');
 const app = express();
 require('./connections');
 
+app.set('view engine', 'jade');
+app.set('views', './views');
+
 app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
