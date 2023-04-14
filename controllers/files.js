@@ -242,6 +242,11 @@ const files = {
     }
 
     try {
+      await s3.deleteObject({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: targetFile.fileName,
+      }).promise();
+
       const filter = {
         '_id': id
       };
