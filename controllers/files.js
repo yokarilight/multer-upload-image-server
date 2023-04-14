@@ -2,9 +2,17 @@ const { S3 } = require('aws-sdk');
 const httpStatusCodes = require('../constants/statusCode');
 const { successMsgs, errMsgs } = require('../constants/msgs');
 const File = require('../models/fileModel');
-const { isNaturalNumber, isValidFrom, getTimeNow, checkQueryParamIsBool, queryParamToBool } = require('../utils/utils');
+const { getTimeNow } = require('../utils/utils');
 const successHandle = require('../utils/successHandler');
 const errorHandle = require('../utils/errorHandler');
+const {
+  getFilesValidate,
+  getSingleFileValidate,
+  createSignFileValidate,
+  updateSignInfoValidate,
+  updateFileInfoValidate,
+  deleteFilesValidate
+} = require('../utils/fileApiValidate');
 
 const s3 = new S3();
 
@@ -57,19 +65,9 @@ const files = {
   getFiles: async (req, res) => {
     const { from, count } = req.query;
 
-    if (!isValidFrom(Number(from))) {
-      errorHandle(res, { message: errMsgs.GET_FILES_FROM_ERROR }, httpStatusCodes.BAD_REQUEST);
-
-      return;
-    }
-
-    if (!isNaturalNumber(Number(count))) {
-      errorHandle(res, { message: errMsgs.GET_FILES_COUNT_ERROR }, httpStatusCodes.BAD_REQUEST);
-
-      return;
-    }
-
     try {
+      getFilesValidate({ from, count });
+
       const allFilesSize = await File.count();
       const allFiles = await File.find().skip(from).limit(count);
       const data = {
@@ -86,13 +84,9 @@ const files = {
   getSingleFile: async (req, res) => {
     const { id } = req.params;
 
-    if (!id) {
-      errorHandle(res, { message: errMsgs.FILE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
-
-      return;
-    }
-
     try {
+      getSingleFileValidate(id);
+
       const targetFile = await File.findOne({
         '_id': id
       });
@@ -110,23 +104,8 @@ const files = {
     }
   },
   createSignatureFile: async (req, res) => {
-    if (!req.files.length) {
-      errorHandle(res, { message: errMsgs.CREATE_FILE_SIGN_REQ_FILES_REQUIRED }, httpStatusCodes.BAD_REQUEST);
-
-      return;
-    }
-
-    const existFile = await File.findOne({
-      'fileName': req.files[0].originalname
-    });
-  
-    if (existFile) {
-      errorHandle(res, { message: `${existFile.fileName} ${errMsgs.DUPLICATE_FILE_NAME}` }, httpStatusCodes.BAD_REQUEST);
-  
-      return;
-    }
-
     try {
+      await createSignFileValidate(req);
       const results = await s3Uploadv2(req.files);
       const timeNow = getTimeNow();
 
@@ -152,36 +131,7 @@ const files = {
   // update only title and isSigned
   updateSignatureInfo: async (req, res) => {
     const { id } = req.params;
-
     const { title, isSigned } = req.body;
-
-    if (!id) {
-      errorHandle(res, { message: errMsgs.FILE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
-
-      return;
-    }
-
-    if (isSigned === false) {
-      errorHandle(res, { message: errMsgs.CANNOT_CHANGE_SIGN_STATUS_TO_UNFINISHED }, httpStatusCodes.BAD_REQUEST);
-
-      return;
-    }
-
-    if (isSigned && typeof isSigned !== 'boolean') {
-      errorHandle(res, { message: errMsgs.ISSIGNED_SHOULD_BE_BOOLEAN }, httpStatusCodes.BAD_REQUEST);
-
-      return;
-    }
-
-    const existFile = await File.findOne({
-      'signTitle': title
-    });
-  
-    if (existFile) {
-      errorHandle(res, { message: errMsgs.DUPLICATE_TITLE }, httpStatusCodes.BAD_REQUEST);
-  
-      return;
-    }
 
     const targetFile = await File.findOne({
       '_id': id
@@ -194,6 +144,8 @@ const files = {
     }
 
     try {
+      await updateSignInfoValidate({ id , title, isSigned });
+
       const filter = {
         '_id': id
       };
@@ -215,22 +167,6 @@ const files = {
   updateFileInfo: async (req, res) => {
     const { id } = req.params;
 
-    if (!id) {
-      errorHandle(res, { message: errMsgs.FILE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
-
-      return;
-    }
-
-    const existFile = await File.findOne({
-      'fileName': req?.files?.[0]?.originalname
-    });
-  
-    if (existFile) {
-      errorHandle(res, { message: `${existFile.fileName} ${errMsgs.DUPLICATE_FILE_NAME}` }, httpStatusCodes.BAD_REQUEST);
-  
-      return;
-    }
-
     const targetFile = await File.findOne({
       '_id': id
     });
@@ -242,6 +178,7 @@ const files = {
     }
 
     try {
+      await updateFileInfoValidate(req, id);
       await s3.deleteObject({
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: targetFile.fileName,
@@ -272,11 +209,8 @@ const files = {
   deleteFiles: async (req, res) => {
     const { id, filename } = req.params;
 
-    if (!id || !filename) {
-      errorHandle(res, { message: errMsgs.DELETE_FILES_FILENAME_REQUIRED }, httpStatusCodes.BAD_REQUEST);
-    }
-
     try {
+      deleteFilesValidate({ id, filename });
       await s3.deleteObject({
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: filename,
