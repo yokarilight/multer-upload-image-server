@@ -121,8 +121,9 @@ const files = {
         modifiedDate: timeNow,
       });
 
-      await newFile.save();
-      successHandle(res, successMsgs.POST_CREATE_SUCCESS);
+      const newFileRes = await newFile.save();
+
+      successHandle(res, { id: newFileRes._id, message: successMsgs.POST_CREATE_SUCCESS });
     }
     catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);

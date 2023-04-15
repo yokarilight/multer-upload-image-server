@@ -5,7 +5,7 @@
     "description": "This API doc is for Signature Service, including signature image and file CRUD.",
     "version": "1.0.0"
   },
-  "host": "auto-signature-app-v7.fly.dev",
+  "host": "auto-signature-app-v7-1.fly.dev",
   "basePath": "/",
   "schemes": [
     "https"
@@ -274,8 +274,17 @@
                   "example": 200
                 },
                 "data": {
-                  "type": "string",
-                  "example": "Create successfully"
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "63d13d5a2782fdfa5e2f239d"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Create successfully"
+                    }
+                  }
                 }
               },
               "xml": {

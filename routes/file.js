@@ -105,7 +105,10 @@ router.post('/', upload.array('file'), (req, res, next) => {
         schema: {
           "status": true,
           "code": 200,
-          "data": "Create successfully"
+          "data": {
+            "id": "63d13d5a2782fdfa5e2f239d",
+            "message": "Create successfully"
+          }
         }
       }
     */
