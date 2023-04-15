@@ -14,12 +14,12 @@ const upload = multer({
   },
   fileFilter(req, file, cb) {
     if (!FileTypes.includes(file.mimetype)) {
-      return cb(new Error('Only .pdf, .csv, .doc, .docx, .ppt, .pptx, .xls and .xlsx format allowed!'));
+      return cb(new Error('Only pdf file allowed!'));
       // cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE'), false);
     }
 
-    // uploading filename should use utf-8 
-    file.originalname = decodeURIComponent(file.originalname)
+    // uploading filename should use utf-8
+    file.originalname = decodeURIComponent(file.originalname);
     
     cb(undefined, true);
   }
