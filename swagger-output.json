@@ -5,7 +5,7 @@
     "description": "This API doc is for Signature Service, including signature image and file CRUD.",
     "version": "1.0.0"
   },
-  "host": "auto-signature-app-v7-2.fly.dev",
+  "host": "auto-signature-app-v7-3.fly.dev",
   "basePath": "/",
   "schemes": [
     "https"
@@ -257,6 +257,18 @@
             "type": "file",
             "required": true,
             "description": "Single file that you upload"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fileName": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -458,6 +470,18 @@
             "in": "formData",
             "type": "file",
             "description": "Single file that you upload"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fileName": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {

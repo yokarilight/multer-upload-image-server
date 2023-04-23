@@ -17,9 +17,6 @@ const upload = multer({
       return cb(new Error('Only pdf file allowed!'));
       // cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE'), false);
     }
-
-    // uploading filename should use utf-8
-    file.originalname = decodeURIComponent(file.originalname);
     
     cb(undefined, true);
   }

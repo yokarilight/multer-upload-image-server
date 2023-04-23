@@ -104,6 +104,8 @@ const files = {
     }
   },
   createSignatureFile: async (req, res) => {
+    const { fileName } = req.body;
+
     try {
       await createSignFileValidate(req);
       const results = await s3Uploadv2(req.files);
@@ -112,7 +114,7 @@ const files = {
       const newFile = new File({
         signTitle: `${new Date(timeNow).toLocaleString()}-example`,
         fileLocation: results[0].Location,
-        fileName: req.files[0].originalname,
+        fileName: fileName,
         fileKey: results[0].Key,
         fileEtag: results[0].ETag,
         fileBucket: results[0].Bucket,
@@ -167,6 +169,7 @@ const files = {
   // reupload new file
   updateFileInfo: async (req, res) => {
     const { id } = req.params;
+    const { fileName } = req.body;
 
     const targetFile = await File.findOne({
       '_id': id
@@ -193,7 +196,7 @@ const files = {
 
       const update = {
         fileLocation: results[0].Location,
-        fileName: req.files[0].originalname,
+        fileName: fileName,
         fileKey: results[0].Key,
         fileEtag: results[0].ETag,
         fileBucket: results[0].Bucket,

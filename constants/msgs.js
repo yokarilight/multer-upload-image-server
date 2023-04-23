@@ -17,6 +17,7 @@ const errMsgs = {
 
   // files
   'FILE_ID_REQUIRED': 'File id is required',
+  'FILENAME_SHOULD_ATTACH': 'Request body should attach fileName',
   // File XXX is already exist. Please...
   'DUPLICATE_FILE_NAME': 'is already existed. Please change your file name',
   'DUPLICATE_TITLE': 'This title is already existed. Please change another title',

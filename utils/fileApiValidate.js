@@ -8,8 +8,9 @@ const checkFileId = (id) => {
   }
 }
 
-const checkSignDuplicateTitle = async (title) => {
+const checkSignDuplicateTitle = async (excludeId, title) => {
   const existFile = await File.findOne({
+    '_id': { $ne: excludeId },
     'signTitle': title
   });
 
@@ -18,8 +19,9 @@ const checkSignDuplicateTitle = async (title) => {
   }
 }
 
-const checkFileDuplicateTitle = async (req) => {
+const checkFileDuplicateTitle = async (req, excludeId) => {
   const existFile = await File.findOne({
+    '_id': { $ne: excludeId },
     'fileName': req.files[0].originalname
   });
 
@@ -42,11 +44,15 @@ const fileApiValidate = {
     checkFileId(id);
   },
   createSignFileValidate: async (req) => {
+    if (!req.body.fileName) {
+      throw new Error(errMsgs.FILENAME_SHOULD_ATTACH);
+    }
+
     if (!req.files.length) {
       throw new Error(errMsgs.CREATE_FILE_SIGN_REQ_FILES_REQUIRED);
     }
 
-    await checkFileDuplicateTitle(req);
+    await checkFileDuplicateTitle(req, id);
   },
   updateSignInfoValidate: async ({ id, title, isSigned }) => {
     checkFileId(id);
@@ -59,11 +65,15 @@ const fileApiValidate = {
       throw new Error(errMsgs.ISSIGNED_SHOULD_BE_BOOLEAN);
     }
 
-    await checkSignDuplicateTitle(title);
+    await checkSignDuplicateTitle(id, title);
   },
   updateFileInfoValidate: async (req, id) => {
+    if (!req.body.fileName) {
+      throw new Error(errMsgs.FILENAME_SHOULD_ATTACH);
+    }
+    
     checkFileId(id);
-    await checkFileDuplicateTitle(req);
+    await checkFileDuplicateTitle(req, id);
   },
   deleteFilesValidate: ({ id, filename }) => {
     if (!id || !filename) {
