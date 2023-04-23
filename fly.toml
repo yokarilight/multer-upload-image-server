@@ -1,6 +1,6 @@
-# fly.toml file generated for auto-signature-app-v7-2 on 2023-04-15T15:45:41+08:00
+# fly.toml file generated for auto-signature-app-v7-3 on 2023-04-23T23:44:38+08:00
 
-app = "auto-signature-app-v7-2"
+app = "auto-signature-app-v7-3"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
