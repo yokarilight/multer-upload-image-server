@@ -19,11 +19,20 @@ const checkSignDuplicateTitle = async (excludeId, title) => {
   }
 }
 
-const checkFileDuplicateTitle = async (req, excludeId) => {
-  const existFile = await File.findOne({
-    '_id': { $ne: excludeId },
-    'fileName': req.files[0].originalname
-  });
+const checkFileDuplicateTitle = async (req, excludeId = '') => {
+  let existFile;
+
+  if (excludeId) {
+    existFile = await File.findOne({
+      '_id': { $ne: excludeId },
+      'fileName': req.files[0].originalname
+    });
+  }
+  else {
+    existFile = await File.findOne({
+      'fileName': req.files[0].originalname
+    });
+  }
 
   if (existFile) {
     throw new Error(`${existFile.fileName} ${errMsgs.DUPLICATE_FILE_NAME}`);
@@ -52,7 +61,7 @@ const fileApiValidate = {
       throw new Error(errMsgs.CREATE_FILE_SIGN_REQ_FILES_REQUIRED);
     }
 
-    await checkFileDuplicateTitle(req, id);
+    await checkFileDuplicateTitle(req);
   },
   updateSignInfoValidate: async ({ id, title, isSigned }) => {
     checkFileId(id);
