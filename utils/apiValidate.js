@@ -93,4 +93,17 @@ const fileApiValidate = {
   }
 }
 
-module.exports =  fileApiValidate;
+const imageApiValidate = {
+  deleteImagesValidate: ({ id, imagename }) => {
+    if (!id || !imagename) {
+      throw new Error(errMsgs.DELETE_IMAGE_ID_IMAGE_NAME_REQUIRED);
+    }
+
+    checkFileId(id);
+  }
+}
+
+module.exports = {
+  fileApiValidate,
+  imageApiValidate
+};

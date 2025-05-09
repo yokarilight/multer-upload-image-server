@@ -12,7 +12,7 @@ const successMsgs = {
 const errMsgs = {
   // images
   'POST_CREATE_SINGLE_IMAGE_FILE_REQUIRED': 'Image file is required',
-  'DELETE_IMAGE_ID_REQUIRED': 'Request params id or hash or imageStr is required',
+  'DELETE_IMAGE_ID_IMAGE_NAME_REQUIRED': 'Request params id or imagename is required',
   'CANNOT_FIND_THIS_IMAGE': 'Cannot find this image',
 
   // files

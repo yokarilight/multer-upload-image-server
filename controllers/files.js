@@ -1,10 +1,11 @@
-const { S3 } = require('aws-sdk');
 const httpStatusCodes = require('../constants/statusCode');
 const { successMsgs, errMsgs } = require('../constants/msgs');
 const File = require('../models/fileModel');
 const { getTimeNow } = require('../utils/utils');
 const successHandle = require('../utils/successHandler');
 const errorHandle = require('../utils/errorHandler');
+const { s3, s3Uploadv2 } = require('../utils/s3Utils');
+const { fileApiValidate } = require('../utils/apiValidate');
 const {
   getFilesValidate,
   getSingleFileValidate,
@@ -12,30 +13,7 @@ const {
   updateSignInfoValidate,
   updateFileInfoValidate,
   deleteFilesValidate
-} = require('../utils/fileApiValidate');
-
-const s3 = new S3();
-
-// get S3 all files in the bucket
-const s3GetFiles = async () => {
-  const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
-  };
-
-  return await s3.listObjects(params).promise();
-}
-
-const s3Uploadv2 = async (files) => {
-  const params = files.map((file) => {
-    return {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: file.originalname,
-      Body: file.buffer,
-    };
-  });
-
-  return await Promise.all(params.map((param) => s3.upload(param).promise()));
-}
+} = fileApiValidate;
 
 const checkDuplicateFile = async (req, res) => {
   const existFile = await File.findOne({

@@ -1,10 +1,11 @@
-const { ImgurClient } = require('imgur');
-const fetch = require('node-fetch');
 const httpStatusCodes = require('../constants/statusCode');
 const { successMsgs, errMsgs } = require('../constants/msgs');
 const Image = require('../models/imageModel');
 const successHandle = require('../utils/successHandler');
 const errorHandle = require('../utils/errorHandler');
+const { s3, s3Uploadv2 } = require('../utils/s3Utils');
+const { imageApiValidate } = require('../utils/apiValidate');
+const { deleteImagesValidate } = imageApiValidate;
 
 const images = {
   getImages: async (res) => {
@@ -17,30 +18,19 @@ const images = {
     }
   },
   createSingleImage: async (req, res) => {
-    if (!req.file) {
+    if (!req.files) {
       errorHandle(res, { message: errMsgs.POST_CREATE_SINGLE_IMAGE_FILE_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
 
     try {
-      const client = new ImgurClient({
-        clientId: process.env.IMGUR_CLIENTID,
-        clientSecret: process.env.IMGUR_CLIENT_SECRET,
-        refreshToken: process.env.IMGUR_REFRESH_TOKEN,
-      });
+      const result = await s3Uploadv2(req.files);
       
-      const response = await client.upload({
-        image: req.file.buffer.toString('base64'),
-        type: 'base64',
-        title: req.file.originalname,
-        album: process.env.IMGUR_ALBUM_ID
-      });
-
       const newImage = new Image({
-        imageUrl: response.data.link,
-        imageName: response.data.title,
-        imageDeleteHash: response.data.deletehash,
+        imageUrl: result[0].Location,
+        imageName: result[0].key,
+        imageDeleteHash: result[0].Key,
       });
 
       await newImage.save();
@@ -51,34 +41,24 @@ const images = {
     }
   },
   deleteSingleImage: async (req, res) => {
-    const { id, hash, imageStr } = req.params;
+    const { id, imagename } = req.params;
 
-    if (!id || !hash || !imageStr) {
-      errorHandle(res, { message: errMsgs.DELETE_IMAGE_ID_REQUIRED }, httpStatusCodes.BAD_REQUEST);
+    if (!id || !imagename) {
+      errorHandle(res, { message: errMsgs.DELETE_IMAGE_ID_IMAGE_NAME_REQUIRED }, httpStatusCodes.BAD_REQUEST);
 
       return;
     }
 
     try {
-      const client = new ImgurClient({
-        clientId: process.env.IMGUR_CLIENTID,
-        clientSecret: process.env.IMGUR_CLIENT_SECRET,
-        refreshToken: process.env.IMGUR_REFRESH_TOKEN,
-      });
+      deleteImagesValidate({ id, imagename });
+      await s3.deleteObject({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: imagename,
+      }).promise();
 
-      const { status } = await fetch(`https://i.imgur.com/${imageStr}`);
+      await Image.findByIdAndDelete(id);
 
-      // something weird: if I remove some characters from the end of hash, it still can delete data from mongoDB
-      // however, target image in imgur dashboard is still existed
-      // e.g. hash: ABC123456 -> hash: ABC12345, will happen as above
-      if (status === 200) {
-        await client.deleteImage(hash);
-        await Image.findByIdAndDelete(id);
-        successHandle(res, successMsgs.DELETE_IMAGES_SUCCESS);
-      }
-      else {
-        errorHandle(res, { message: errMsgs.CANNOT_FIND_THIS_IMAGE }, httpStatusCodes.BAD_REQUEST);
-      }
+      successHandle(res, successMsgs.DELETE_SUCCESS);
 
     } catch (err) {
       errorHandle(res, err, httpStatusCodes.BAD_REQUEST);

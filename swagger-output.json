@@ -97,7 +97,7 @@
         }
       }
     },
-    "/image/{id}/hash/{hash}/image-str/{imageStr}": {
+    "/image/{id}/imagename/{imagename}": {
       "delete": {
         "tags": [
           "Images - 圖片相關API"
@@ -111,13 +111,7 @@
             "type": "string"
           },
           {
-            "name": "hash",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "imageStr",
+            "name": "imagename",
             "in": "path",
             "required": true,
             "type": "string"

@@ -45,7 +45,7 @@ router.get('/', (req, res, next) => {
 //   imageController.getSingleImages(req, res);
 // });
 
-router.post('/', upload.single('image'), (req, res, next) => {
+router.post('/', upload.array('image'), (req, res, next) => {
   /**
     * #swagger.tags = ['Images - 圖片相關API']
     * #swagger.description = 'Upload Image API'
@@ -70,7 +70,7 @@ router.post('/', upload.single('image'), (req, res, next) => {
 //   imageController.deleteAllImages(res);
 // });
 
-router.delete('/:id/hash/:hash/image-str/:imageStr', (req, res, next) => {
+router.delete('/:id/imagename/:imagename', (req, res, next) => {
   /**
     * #swagger.tags = ['Images - 圖片相關API']
     * #swagger.description = 'Delete Image API'
