@@ -1,15 +1,30 @@
 const successMsgs = {
-  // images
-  'POST_CREATE_SINGLE_IMAGE_NAME_SUCCESS': 'Upload image successfully',
-  'DELETE_IMAGES_SUCCESS': 'Delete image successfully',
-
-  // files
+  // common
   'POST_CREATE_SUCCESS': 'Create successfully',
   'PATCH_UPDATE_SUCCESS': 'Update successfully',
   'DELETE_SUCCESS': 'Delete successfully',
+
+  // users
+  'POST_CREATE_USER_SUCCESS': 'Create user successfully',
+  'DELETE_USER_SUCCESS': 'Delete user successfully',
+
+  // images
+  'POST_CREATE_SINGLE_IMAGE_NAME_SUCCESS': 'Upload image successfully',
+  'DELETE_IMAGES_SUCCESS': 'Delete image successfully',
 };
 
 const errMsgs = {
+  // auth
+  'MISSING_TOKEN': 'Missing token',
+  'INVALID_OR_EXPIRED_TOKEN': 'Invalid or expired token',
+  'INVALID_CREDENTIALS': 'Invalid credentials',
+  'USER_NOT_ACTIVE': 'User not active',
+
+  // users
+  'POST_CREATE_USER_EMAIL_PASSWORD_REQUIRED': 'Email and password are required',
+  'POST_CREATE_USER_EMAIL_TAKEN': 'Email is already taken',
+  'DELETE_IMAGES_SUCCESS': 'User id is required',
+
   // images
   'POST_CREATE_SINGLE_IMAGE_FILE_REQUIRED': 'Image file is required',
   'DELETE_IMAGE_ID_IMAGE_NAME_REQUIRED': 'Request params id or imagename is required',

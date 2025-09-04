@@ -1,7 +1,7 @@
-const successHandle = (res, data) => {
+const successHandle = (res, data, statusCode = 200) => {
   res.send({
     status: true,
-    code: 200,
+    code: statusCode,
     data
   });
 }
